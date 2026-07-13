@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SNAPTHENTIC STUDIO</title><style>body{margin:0;font-family:Arial,sans-serif;background:#111;color:#fff;text-align:center}h1{color:#25d366;margin-top:20px}.counter{margin:15px 0;font-size:18px}button{padding:12px 18px;margin:5px;border:none;border-radius:8px;background:#25d366;color:#fff;cursor:pointer;font-size:14px}button:hover{opacity:.9}.loading{margin-top:30px;font-size:18px}.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:20px}.item{position:relative}.item img{width:100%;border-radius:10px;cursor:pointer}.item input{position:absolute;top:8px;left:8px;transform:scale(1.5);z-index:2}.viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);justify-content:center;align-items:center;z-index:999}.viewer img{max-width:95%;max-height:90%}.close{position:absolute;top:20px;right:25px;font-size:35px;cursor:pointer}</style></head><body><h1>SNAPTHENTIC STUDIO</h1><div class="counter">Terpilih:<span id="jumlah">0</span>foto</div><div><button onclick="pilihSemua()">Pilih Semua</button><button onclick="hapusSemua()">Hapus Semua</button></div><div id="loading" class="loading">Loading foto...</div><div class="gallery" id="gallery"></div><button onclick="kirimWA()">Kirim ke WhatsApp</button><div class="viewer" id="viewer" onclick="tutupFoto()"><div class="close">×</div><img id="fotoBesar"></div><script>const username = "eriparwanto36-design";
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SNAPTHENTIC STUDIO</title><style>body{margin:0;font-family:Arial,sans-serif;background:#111;color:#fff;text-align:center}h1{color:#25d366;margin-top:20px}.counter{margin:15px 0;font-size:18px}button{padding:12px 18px;margin:5px;border:none;border-radius:8px;background:#25d366;color:#fff;cursor:pointer;font-size:14px}button:hover{opacity:.9}.loading{margin-top:30px;font-size:18px}.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:20px}.item{position:relative}.item img{width:100%;border-radius:10px;cursor:pointer}.item input{position:absolute;top:8px;left:8px;transform:scale(1.5);z-index:2}.viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);justify-content:center;align-items:center;z-index:999}.viewer img{max-width:95%;max-height:90%}.close{position:absolute;top:20px;right:25px;font-size:35px;cursor:pointer}</style></head><body><h1>SNAPTHENTIC STUDIO</h1><div class="counter">Terpilih:<span id="jumlah">0</span>foto</div><div><button onclick="pilihSemua()">Pilih Semua</button><button onclick="hapusSemua()">Hapus Semua</button></div><div id="loading" class="loading">Loading foto...</div><div class="gallery" id="gallery"></div><button onclick="kirimWA()">Kirim ke WhatsApp</button><div class="viewer" id="viewer"><div class="close" onclick="tutupFoto()">×</div><label style="position:absolute;left:20px;top:20px;background:#0008;padding:8px;border-radius:8px"><input id="previewCheck" type="checkbox"> Pilih</label><img id="fotoBesar"></div><script>const username = "eriparwanto36-design";
         const repo = "galery-client";
-        const folder = "images";
+        const folder="images";let photos=[];let current=0;
 
         async function loadImages() {
 
@@ -15,7 +15,7 @@
                 const gallery = document.getElementById("gallery");
                 document.getElementById("loading").style.display = "none";
 
-                data.forEach(file => {
+                data.forEach(file => { photos.push(file.download_url);
 
                     if (
                         file.type === "file" &&
@@ -28,7 +28,7 @@
                         item.innerHTML = `
                             <img
                                 src="${file.download_url}"
-                                onclick="bukaFoto('${file.download_url}')">
+                                onclick="bukaFoto(${photos.length-1})">
 
                             <input
                                 type="checkbox"
@@ -75,7 +75,7 @@
             updateJumlah();
         }
 
-        function bukaFoto(url) {
+        /*old*/function bukaFoto_old(url){
 
             document.getElementById("viewer").style.display = "flex";
             document.getElementById("fotoBesar").src = url;
@@ -102,7 +102,7 @@
             const nomor = "6282292261224";
 
             const text =
-                "Halo, saya pilih " +
+                "Halo kak, saya pilih " +
                 data.length +
                 " foto:%0A" +
                 data.join("%0A");
@@ -115,4 +115,12 @@
             );
         }
 
-        loadImages();</script></body></html>
+        
+function bukaFoto(i){current=i;viewer.style.display='flex';fotoBesar.src=photos[current];sync();}
+function sync(){const n=photos[current].split('/').pop();const c=[...document.querySelectorAll('.item input')].find(x=>x.value===n);previewCheck.checked=c.checked;}
+previewCheck.onchange=()=>{const n=photos[current].split('/').pop();const c=[...document.querySelectorAll('.item input')].find(x=>x.value===n);c.checked=previewCheck.checked;updateJumlah();}
+function next(){if(current<photos.length-1){current++;fotoBesar.src=photos[current];sync();}}
+function prev(){if(current>0){current--;fotoBesar.src=photos[current];sync();}}
+let sx=0;fotoBesar.addEventListener('touchstart',e=>sx=e.touches[0].clientX);fotoBesar.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx;if(dx<-50)next();if(dx>50)prev();});
+
+loadImages();</script></body></html>
